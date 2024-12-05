@@ -4,6 +4,7 @@ import com.example.effective_mobile.model.Task;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.TaskRepository;
 import com.example.effective_mobile.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +35,12 @@ public class TaskService
         }
     }
 
-    public void deleteTask(User user, Long id)
+    public void deleteTask(Long userId, Long taskId)
     {
-        Optional<Task> taskOptional = taskRepository.findById(id);
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
         if(taskOptional.isPresent())
         {
-            taskRepository.deleteById(id);
+            taskRepository.deleteById(taskId);
         }
         else
         {
@@ -47,25 +48,33 @@ public class TaskService
         }
     }
 
-    public void editTask(User user, Long taskId, Task updatedTask)
+    public Task editTask(Long userId, Long taskId, Task updatedTask)
     {
-        Task task = taskRepository.findByAuthorAndId(user, taskId);
+        Task task = taskRepository.findByAuthorIdAndId(userId, taskId);
         if(task != null)
         {
             task.setHeader(updatedTask.getHeader());
             task.setDescription(updatedTask.getDescription());
             task.setStatus(updatedTask.getStatus());
+            task.setPriority(updatedTask.getPriority());
 
             taskRepository.save(task);
+
+            return task;
         }
         else
         {
-            System.out.println("This task does not exist");
+            throw new EntityNotFoundException("This task does not exist");
         }
     }
 
     public List<Task> getAllTasks()
     {
         return taskRepository.findAll();
+    }
+
+    public Optional<Task> getASpecificTask(Long userId, Long taskId)
+    {
+        return taskRepository.findById(taskId);
     }
 }

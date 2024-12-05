@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/task")
@@ -21,8 +22,26 @@ public class TaskController
     }
 
     @PostMapping("/{user_id}")
-    public void createTask(@PathVariable  Long user_id, @RequestBody Task task)
+    public void createTask(@PathVariable("user_id") Long user_id, @RequestBody Task task)
     {
         taskService.createTask(user_id, task);
+    }
+
+    @DeleteMapping("/{user_id}/{task_id}")
+    public void deleteTask(@PathVariable("user_id") Long userId, @PathVariable("task_id") Long task_id)
+    {
+        taskService.deleteTask(userId, task_id);
+    }
+
+    @PutMapping("/{user_id}/{task_id}")
+    public void updateTask(@PathVariable("user_id") Long userId, @PathVariable("task_id") Long taskId, @RequestBody Task updatedTask)
+    {
+        taskService.editTask(userId, taskId, updatedTask);
+    }
+
+    @GetMapping("/{user_id}/{task_id}")
+    public Optional<Task> getASpecificTask(@PathVariable("user_id") Long userId, @PathVariable("task_id") Long taskId)
+    {
+        return taskService.getASpecificTask(userId, taskId);
     }
 }
