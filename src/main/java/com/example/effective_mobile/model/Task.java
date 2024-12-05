@@ -15,9 +15,13 @@ public class Task
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String header;
+
     private String description;
+
     private String status;
+
     private String priority;
 
     @ManyToOne()
