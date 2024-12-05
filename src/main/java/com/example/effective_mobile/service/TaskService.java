@@ -6,6 +6,8 @@ import com.example.effective_mobile.repository.TaskRepository;
 import com.example.effective_mobile.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,27 +33,53 @@ public class TaskService
         }
         else
         {
-            System.out.println("This user does not exist");
+            throw new EntityNotFoundException("User not found");
         }
     }
 
     public void deleteTask(Long userId, Long taskId)
     {
-        Optional<Task> taskOptional = taskRepository.findById(taskId);
-        if(taskOptional.isPresent())
+        String currentUserEmail = getCurrentUserEmail();
+        User currentUser = userRepository.findByEmail(currentUserEmail);
+
+        if(currentUser == null)
         {
-            taskRepository.deleteById(taskId);
+            throw new EntityNotFoundException("User not found");
+        }
+
+        Task task = taskRepository.findByAuthorIdAndId(userId, taskId);
+        if (task == null)
+        {
+            throw new EntityNotFoundException("Task not found");
+        }
+
+        if(currentUser.getRole().equals("ADMIN") || task.getAuthor().getId().equals(currentUser.getId()))
+        {
+            taskRepository.delete(task);
         }
         else
         {
-            System.out.println("This task does not exist");
+            throw new SecurityException("You do not have permission to edit this task");
         }
     }
 
     public Task editTask(Long userId, Long taskId, Task updatedTask)
     {
+        String currentUserEmail = getCurrentUserEmail();
+        User currentUser = userRepository.findByEmail(currentUserEmail);
+
+        if(currentUser == null)
+        {
+            throw new EntityNotFoundException("User not found");
+        }
+
         Task task = taskRepository.findByAuthorIdAndId(userId, taskId);
-        if(task != null)
+        if (task == null)
+        {
+            throw new EntityNotFoundException("Task not found");
+        }
+
+        if(currentUser.getRole().equals("ADMIN") || task.getAuthor().getId().equals(currentUser.getId()))
         {
             task.setHeader(updatedTask.getHeader());
             task.setDescription(updatedTask.getDescription());
@@ -64,7 +92,21 @@ public class TaskService
         }
         else
         {
-            throw new EntityNotFoundException("This task does not exist");
+            throw new SecurityException("You do not have permission to edit this task");
+        }
+    }
+
+    private String getCurrentUserEmail()
+    {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails)
+        {
+            return ((UserDetails) principal).getUsername();
+        }
+        else
+        {
+            return principal.toString();
         }
     }
 

@@ -28,9 +28,9 @@ public class TaskController
     }
 
     @DeleteMapping("/{user_id}/{task_id}")
-    public void deleteTask(@PathVariable("user_id") Long userId, @PathVariable("task_id") Long task_id)
+    public void deleteTask(@PathVariable("user_id") Long userId, @PathVariable("task_id") Long taskId)
     {
-        taskService.deleteTask(userId, task_id);
+        taskService.deleteTask(userId, taskId);
     }
 
     @PutMapping("/{user_id}/{task_id}")

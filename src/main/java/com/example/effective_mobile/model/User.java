@@ -17,9 +17,9 @@ public class User
     private String email;
 
     @Column(nullable = false)
-    @NotNull
     private String password;
 
+    @Column(nullable = false)
     private String role;
 
 }
