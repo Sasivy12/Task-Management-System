@@ -3,13 +3,12 @@ package com.example.effective_mobile.controller;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping
 public class UserController
 {
     @Autowired
@@ -18,6 +17,18 @@ public class UserController
     @PostMapping("/register")
     public void registerUser(@RequestBody User user)
     {
-        userService.createUser(user);
+        userService.register(user);
+    }
+
+    @GetMapping()
+    public List<User> returnAllUsers()
+    {
+        return userService.getAllUsers();
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody User user)
+    {
+        return userService.verify(user);
     }
 }
