@@ -8,6 +8,8 @@ import com.example.effective_mobile.repository.TaskRepository;
 import com.example.effective_mobile.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,13 +32,14 @@ public class CommentService
 
     public Comment createComment(Long taskId, Long authorId, Comment comment)
     {
-        Optional<Task> task = taskRepository.findById(taskId);
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
         Optional<User> author = userRepository.findById(authorId);
 
         if(author.isPresent())
         {
-            if(task.isPresent())
+            if(taskOptional.isPresent())
             {
+                Task task = taskOptional.get();
                 comment.setTask(task);
                 comment.setAuthor(author);
                 comment.setCreatedAt(LocalDate.now());
@@ -54,52 +57,131 @@ public class CommentService
         }
     }
 
-    public List<Comment> getCommentsByTask(Long taskId)
+    public List<Comment> getCommentsByTask(Long taskId, Long authorId)
     {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
-        if(taskOptional.isPresent())
+        Optional<User> author = userRepository.findById(authorId);
+
+        if(author.isPresent())
         {
-            Task task = taskOptional.get();
-            return commentRepository.findByTask(task);
+            if(taskOptional.isPresent())
+            {
+                Task task = taskOptional.get();
+                return commentRepository.findByTask(task);
+            }
+            else
+            {
+                throw new EntityNotFoundException("Task not found");
+            }
         }
         else
         {
+            throw new EntityNotFoundException("User not found");
+        }
+    }
+
+    public List<Comment> getCommentsByUser(Long taskId, Long authorId)
+    {
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        Optional<User> author = userRepository.findById(authorId);
+
+        if(author.isPresent())
+        {
+            if(taskOptional.isPresent())
+            {
+                Optional<User> user = userRepository.findById(authorId);
+                return commentRepository.findByAuthor(user);
+            }
+            else
+            {
+                throw new EntityNotFoundException("Task not found");
+            }
+        }
+        else
+        {
+            throw new EntityNotFoundException("User not found");
+        }
+
+    }
+
+    public Comment editComment(Long commentId, Long authorId, Long taskId, Comment updatedMessage)
+    {
+        String currentUserEmail = getCurrentUserEmail();
+        User currentUser = userRepository.findByEmail(currentUserEmail);
+
+        if(currentUser == null)
+        {
+            throw new EntityNotFoundException("User not found");
+        }
+
+        Task task = taskRepository.findByAuthorIdAndId(authorId, taskId);
+        if (task == null)
+        {
             throw new EntityNotFoundException("Task not found");
         }
-    }
 
-    public List<Comment> getCommentsByUser(Long userId)
-    {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        return commentRepository.findByAuthor(user);
-    }
-
-    public Comment editComment(Long commentId, Long authorId, String updatedMessage)
-    {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
-
-        if (!comment.getAuthor().getId().equals(authorId))
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+        if(commentOptional.isEmpty())
         {
-            throw new SecurityException("You are not allowed to edit this comment");
+            throw new EntityNotFoundException("Comment not found");
         }
 
-        comment.setMessage(updatedMessage);
-        return commentRepository.save(comment);
+        Comment comment = commentOptional.get();
+        if(currentUser.getRole().equals("ADMIN") || task.getAuthor().getId().equals(currentUser.getId()))
+        {
+            comment.setMessage(updatedMessage);
+            return commentRepository.save(comment);
+        }
+        else
+        {
+            throw new SecurityException("You do not have permission to edit this task");
+        }
     }
 
     public void deleteComment(Long commentId, Long authorId)
     {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
+        String currentUserEmail = getCurrentUserEmail();
+        User currentUser = userRepository.findByEmail(currentUserEmail);
 
-        if (!comment.getAuthor().getId().equals(authorId))
+        if(currentUser == null)
         {
-            throw new SecurityException("You are not allowed to delete this comment");
+            throw new EntityNotFoundException("User not found");
         }
 
-        commentRepository.delete(comment);
+        Task task = taskRepository.findByAuthorIdAndId(authorId, taskId);
+        if (task == null)
+        {
+            throw new EntityNotFoundException("Task not found");
+        }
+
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+        if(commentOptional.isEmpty())
+        {
+            throw new EntityNotFoundException("Comment not found");
+        }
+
+        Comment comment = commentOptional.get();
+        if(currentUser.getRole().equals("ADMIN") || task.getAuthor().getId().equals(currentUser.getId()))
+        {
+            commentRepository.delete(comment);
+        }
+        else
+        {
+            throw new SecurityException("You do not have permission to edit this task");
+        }    }
+
+    private String getCurrentUserEmail()
+    {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails)
+        {
+            return ((UserDetails) principal).getUsername();
+        }
+        else
+        {
+            return principal.toString();
+        }
     }
+
 }
