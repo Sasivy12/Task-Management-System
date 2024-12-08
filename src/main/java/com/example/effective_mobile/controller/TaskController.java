@@ -1,6 +1,8 @@
 package com.example.effective_mobile.controller;
 
+import com.example.effective_mobile.model.Comment;
 import com.example.effective_mobile.model.Task;
+import com.example.effective_mobile.service.CommentService;
 import com.example.effective_mobile.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,9 @@ public class TaskController
 {
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private CommentService commentService;
 
     @GetMapping("/")
     public List<Task> getAllTasks()
@@ -34,7 +39,8 @@ public class TaskController
     }
 
     @PutMapping("/{user_id}/{task_id}")
-    public void updateTask(@PathVariable("user_id") Long userId, @PathVariable("task_id") Long taskId, @RequestBody Task updatedTask)
+    public void updateTask(@PathVariable("user_id") Long userId,
+                           @PathVariable("task_id") Long taskId, @RequestBody Task updatedTask)
     {
         taskService.editTask(userId, taskId, updatedTask);
     }
@@ -43,5 +49,41 @@ public class TaskController
     public Optional<Task> getASpecificTask(@PathVariable("user_id") Long userId, @PathVariable("task_id") Long taskId)
     {
         return taskService.getASpecificTask(userId, taskId);
+    }
+
+    @PostMapping("/{user_id}/{task_id}")
+    public Comment createComment(@PathVariable("task_id") Long taskId,
+                                 @PathVariable("user_id") Long authorId, @RequestBody Comment comment)
+    {
+        return commentService.createComment(taskId, authorId, comment);
+    }
+
+    @DeleteMapping("/{user_id}/{task_id}/{comment_id}")
+    public void deleteComment(@PathVariable("comment_id") Long commentId,
+                              @PathVariable("user_id") Long authorId, @PathVariable("task_id") Long taskId)
+    {
+        commentService.deleteComment(commentId, authorId, taskId);
+    }
+
+    @GetMapping("/{user_id}/{task_id}/comment")
+    public List<Comment> getCommentByTask(@PathVariable("task_id") Long taskId,
+                                          @PathVariable("user_id") Long authorId)
+    {
+        return commentService.getCommentsByTask(taskId, authorId);
+    }
+
+    @PutMapping("/{user_id}/{task_id}/{comment_id}")
+    public void updateComment(@PathVariable("comment_id") Long commentId,
+                              @PathVariable("user_id") Long authorId, @PathVariable("task_id") Long taskId,
+                              @RequestBody Comment updatedComment)
+    {
+        commentService.editComment(commentId, authorId, taskId, updatedComment);
+    }
+
+    @GetMapping("/{user_id}/{task_id}/comments/byuser")
+    public List<Comment> getCommentsByUser(@PathVariable("task_id") Long taskId,
+                                           @PathVariable("user_id") Long authorId)
+    {
+        return commentService.getCommentsByUser(taskId, authorId);
     }
 }

@@ -15,5 +15,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long>
 
     List<Comment> findByTask(Task task);
 
-    List<Comment> findByAuthor(Optional<User> user);
+    List<Comment> findByTaskAndAuthor(Task task, User author);
 }

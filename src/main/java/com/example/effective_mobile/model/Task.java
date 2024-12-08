@@ -1,9 +1,12 @@
 package com.example.effective_mobile.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
@@ -31,5 +34,9 @@ public class Task
     @ManyToOne()
     @JoinColumn(name = "executor_id")
     private User executor;
+
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
 }

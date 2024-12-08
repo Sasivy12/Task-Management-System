@@ -41,7 +41,7 @@ public class CommentService
             {
                 Task task = taskOptional.get();
                 comment.setTask(task);
-                comment.setAuthor(author);
+                comment.setAuthor(author.get());
                 comment.setCreatedAt(LocalDate.now());
 
                 return commentRepository.save(comment);
@@ -82,29 +82,17 @@ public class CommentService
 
     public List<Comment> getCommentsByUser(Long taskId, Long authorId)
     {
-        Optional<Task> taskOptional = taskRepository.findById(taskId);
-        Optional<User> author = userRepository.findById(authorId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
-        if(author.isPresent())
-        {
-            if(taskOptional.isPresent())
-            {
-                Optional<User> user = userRepository.findById(authorId);
-                return commentRepository.findByAuthor(user);
-            }
-            else
-            {
-                throw new EntityNotFoundException("Task not found");
-            }
-        }
-        else
-        {
-            throw new EntityNotFoundException("User not found");
-        }
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        return commentRepository.findByTaskAndAuthor(task, author);
 
     }
 
-    public Comment editComment(Long commentId, Long authorId, Long taskId, Comment updatedMessage)
+    public Comment editComment(Long commentId, Long authorId, Long taskId, Comment updatedComment)
     {
         String currentUserEmail = getCurrentUserEmail();
         User currentUser = userRepository.findByEmail(currentUserEmail);
@@ -129,16 +117,16 @@ public class CommentService
         Comment comment = commentOptional.get();
         if(currentUser.getRole().equals("ADMIN") || task.getAuthor().getId().equals(currentUser.getId()))
         {
-            comment.setMessage(updatedMessage);
+            comment.setMessage(updatedComment.getMessage());
             return commentRepository.save(comment);
         }
         else
         {
-            throw new SecurityException("You do not have permission to edit this task");
+            throw new SecurityException("You do not have permission to edit this comment");
         }
     }
 
-    public void deleteComment(Long commentId, Long authorId)
+    public void deleteComment(Long commentId, Long authorId, Long taskId)
     {
         String currentUserEmail = getCurrentUserEmail();
         User currentUser = userRepository.findByEmail(currentUserEmail);
@@ -167,7 +155,7 @@ public class CommentService
         }
         else
         {
-            throw new SecurityException("You do not have permission to edit this task");
+            throw new SecurityException("You do not have permission to edit this comment");
         }    }
 
     private String getCurrentUserEmail()

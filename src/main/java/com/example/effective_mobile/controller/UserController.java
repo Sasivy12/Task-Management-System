@@ -20,12 +20,6 @@ public class UserController
         userService.register(user);
     }
 
-    @GetMapping()
-    public List<User> returnAllUsers()
-    {
-        return userService.getAllUsers();
-    }
-
     @PostMapping("/login")
     public String login(@RequestBody User user)
     {
