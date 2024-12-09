@@ -120,6 +120,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>effective_mobile</finalName>
 	</build>
 
 </project>
