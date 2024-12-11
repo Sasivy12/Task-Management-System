@@ -38,22 +38,24 @@ public class UserService
         }
     }
 
-    public List<User> getAllUsers()
-    {
-        return repository.findAll();
-    }
-
     public String verify(User user)
     {
-        Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
-
-        if(authentication.isAuthenticated())
+        try
         {
-            String token = jwtService.generateToken(user.getEmail());
-            return token;
+            Authentication authentication = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+
+            if (authentication.isAuthenticated())
+            {
+                return jwtService.generateToken(user.getEmail());
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("Authentication failed: " + e.getMessage());
         }
         return "FAILED";
     }
+
 
 }
