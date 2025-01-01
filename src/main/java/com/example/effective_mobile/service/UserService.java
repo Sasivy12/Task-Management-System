@@ -1,6 +1,7 @@
 package com.example.effective_mobile.service;
 
 import com.example.effective_mobile.exception.AuthenticationFailedException;
+import com.example.effective_mobile.exception.UserAlreadyExistsException;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class UserService
     {
         if(repository.existsByEmail(user.getEmail()))
         {
-            System.out.println("User already exists");
+            throw new UserAlreadyExistsException("User with this email: " + user.getEmail() + " already exists");
         }
         else
         {
