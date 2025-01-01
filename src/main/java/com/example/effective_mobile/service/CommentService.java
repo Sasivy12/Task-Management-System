@@ -1,5 +1,8 @@
 package com.example.effective_mobile.service;
 
+import com.example.effective_mobile.exception.CommentNotFoundException;
+import com.example.effective_mobile.exception.TaskNotFoundException;
+import com.example.effective_mobile.exception.UserNotFoundException;
 import com.example.effective_mobile.model.Comment;
 import com.example.effective_mobile.model.Task;
 import com.example.effective_mobile.model.User;
@@ -48,12 +51,12 @@ public class CommentService
             }
             else
             {
-                throw new EntityNotFoundException("Task not found");
+                throw new TaskNotFoundException("Task not found");
             }
         }
         else
         {
-            throw new EntityNotFoundException("User not found");
+            throw new UserNotFoundException("User not found");
         }
     }
 
@@ -71,22 +74,22 @@ public class CommentService
             }
             else
             {
-                throw new EntityNotFoundException("Task not found");
+                throw new TaskNotFoundException("Task not found");
             }
         }
         else
         {
-            throw new EntityNotFoundException("User not found");
+            throw new UserNotFoundException("User not found");
         }
     }
 
     public List<Comment> getCommentsByUser(Long taskId, Long authorId)
     {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
 
         User author = userRepository.findById(authorId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return commentRepository.findByTaskAndAuthor(task, author);
 
@@ -99,19 +102,19 @@ public class CommentService
 
         if(currentUser == null)
         {
-            throw new EntityNotFoundException("User not found");
+            throw new UserNotFoundException("User not found");
         }
 
         Task task = taskRepository.findByAuthorIdAndId(authorId, taskId);
         if (task == null)
         {
-            throw new EntityNotFoundException("Task not found");
+            throw new TaskNotFoundException("Task not found");
         }
 
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
         if(commentOptional.isEmpty())
         {
-            throw new EntityNotFoundException("Comment not found");
+            throw new CommentNotFoundException("Comment not found");
         }
 
         Comment comment = commentOptional.get();
@@ -133,19 +136,19 @@ public class CommentService
 
         if(currentUser == null)
         {
-            throw new EntityNotFoundException("User not found");
+            throw new UserNotFoundException("User not found");
         }
 
         Task task = taskRepository.findByAuthorIdAndId(authorId, taskId);
         if (task == null)
         {
-            throw new EntityNotFoundException("Task not found");
+            throw new TaskNotFoundException("Task not found");
         }
 
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
         if(commentOptional.isEmpty())
         {
-            throw new EntityNotFoundException("Comment not found");
+            throw new CommentNotFoundException("Comment not found");
         }
 
         Comment comment = commentOptional.get();
@@ -156,7 +159,8 @@ public class CommentService
         else
         {
             throw new SecurityException("You do not have permission to edit this comment");
-        }    }
+        }
+    }
 
     private String getCurrentUserEmail()
     {

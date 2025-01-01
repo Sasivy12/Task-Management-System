@@ -1,5 +1,6 @@
 package com.example.effective_mobile.service;
 
+import com.example.effective_mobile.exception.AuthenticationFailedException;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ public class UserService
         }
         catch (Exception e)
         {
-            System.out.println("Authentication failed: " + e.getMessage());
+            throw new AuthenticationFailedException("Authentication failed for user: " + user.getEmail());
         }
         return "FAILED";
     }

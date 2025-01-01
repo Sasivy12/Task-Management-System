@@ -1,5 +1,7 @@
 package com.example.effective_mobile.service;
 
+import com.example.effective_mobile.exception.TaskNotFoundException;
+import com.example.effective_mobile.exception.UserNotFoundException;
 import com.example.effective_mobile.model.Task;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.TaskRepository;
@@ -33,7 +35,7 @@ public class TaskService
         }
         else
         {
-            throw new EntityNotFoundException("User not found");
+            throw new UserNotFoundException("User not found");
         }
     }
 
@@ -50,7 +52,7 @@ public class TaskService
         Task task = taskRepository.findByAuthorIdAndId(userId, taskId);
         if (task == null)
         {
-            throw new EntityNotFoundException("Task not found");
+            throw new TaskNotFoundException("Task not found");
         }
 
         if(currentUser.getRole().equals("ADMIN") || task.getAuthor().getId().equals(currentUser.getId()))
@@ -70,13 +72,13 @@ public class TaskService
 
         if(currentUser == null)
         {
-            throw new EntityNotFoundException("User not found");
+            throw new UserNotFoundException("User not found");
         }
 
         Task task = taskRepository.findByAuthorIdAndId(userId, taskId);
         if (task == null)
         {
-            throw new EntityNotFoundException("Task not found");
+            throw new TaskNotFoundException("Task not found");
         }
 
         if(currentUser.getRole().equals("ADMIN") || task.getAuthor().getId().equals(currentUser.getId()))
