@@ -6,7 +6,6 @@ import com.example.effective_mobile.model.Task;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.TaskRepository;
 import com.example.effective_mobile.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,7 +45,7 @@ public class TaskService
 
         if(currentUser == null)
         {
-            throw new EntityNotFoundException("User not found");
+            throw new UserNotFoundException("User not found");
         }
 
         Task task = taskRepository.findByAuthorIdAndId(userId, taskId);
