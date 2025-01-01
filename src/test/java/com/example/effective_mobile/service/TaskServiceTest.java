@@ -1,5 +1,7 @@
 package com.example.effective_mobile.service;
 
+import com.example.effective_mobile.exception.TaskNotFoundException;
+import com.example.effective_mobile.exception.UserNotFoundException;
 import com.example.effective_mobile.model.Task;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.TaskRepository;
@@ -82,7 +84,7 @@ class TaskServiceTest {
     void testCreateTask_UserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(EntityNotFoundException.class, () -> taskService.createTask(1L, task));
+        Exception exception = assertThrows(UserNotFoundException.class, () -> taskService.createTask(1L, task));
         assertEquals("User not found", exception.getMessage());
     }
 
@@ -116,7 +118,7 @@ class TaskServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         // Act & Assert
-        Exception exception = assertThrows(EntityNotFoundException.class, () -> taskService.deleteTask(1L, 1L));
+        Exception exception = assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(1L, 1L));
         assertEquals("Task not found", exception.getMessage());
     }
 

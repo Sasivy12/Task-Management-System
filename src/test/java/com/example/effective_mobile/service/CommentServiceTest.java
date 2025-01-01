@@ -1,12 +1,13 @@
 package com.example.effective_mobile.service;
 
+import com.example.effective_mobile.exception.TaskNotFoundException;
+import com.example.effective_mobile.exception.UserNotFoundException;
 import com.example.effective_mobile.model.Comment;
 import com.example.effective_mobile.model.Task;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.CommentRepository;
 import com.example.effective_mobile.repository.TaskRepository;
 import com.example.effective_mobile.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,7 +18,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,7 +89,7 @@ class CommentServiceTest
         when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
         when(userRepository.findById(authorId)).thenReturn(Optional.of(new User()));
 
-        assertThrows(EntityNotFoundException.class, () -> commentService.createComment(taskId, authorId, comment));
+        assertThrows(TaskNotFoundException.class, () -> commentService.createComment(taskId, authorId, comment));
     }
 
     @Test
@@ -102,7 +102,7 @@ class CommentServiceTest
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(new Task()));
         when(userRepository.findById(authorId)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> commentService.createComment(taskId, authorId, comment));
+        assertThrows(UserNotFoundException.class, () -> commentService.createComment(taskId, authorId, comment));
     }
 
     @Test

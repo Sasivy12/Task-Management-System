@@ -1,5 +1,6 @@
 package com.example.effective_mobile.service;
 
+import com.example.effective_mobile.exception.AuthenticationFailedException;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,12 +104,14 @@ class UserServiceTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new RuntimeException("Authentication failed"));
 
-        // Act
-        String result = userService.verify(user);
+        // Act & Assert
+        AuthenticationFailedException exception = assertThrows(AuthenticationFailedException.class, () -> {
+            userService.verify(user);
+        });
 
-        // Assert
-        assertEquals("FAILED", result);
+        assertEquals("Authentication failed for user: test@example.com", exception.getMessage());
         verify(jwtService, never()).generateToken(anyString());
     }
+
 
 }
