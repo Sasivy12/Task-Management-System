@@ -92,7 +92,6 @@ public class CommentService
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return commentRepository.findByTaskAndAuthor(task, author);
-
     }
 
     public Comment editComment(Long commentId, Long authorId, Long taskId, Comment updatedComment)

@@ -1,6 +1,7 @@
 package com.example.effective_mobile.service;
 
 import com.example.effective_mobile.exception.AuthenticationFailedException;
+import com.example.effective_mobile.exception.UserAlreadyExistsException;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,8 @@ class UserServiceTest {
     }
 
     @Test
-    void testRegister_UserAlreadyExists() {
+    void testRegister_UserAlreadyExists()
+    {
         // Arrange
         User user = new User();
         user.setEmail("test@example.com");
@@ -50,12 +52,13 @@ class UserServiceTest {
 
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
 
-        // Act
-        userService.register(user);
+        // Act & Assert
+        assertThrows(UserAlreadyExistsException.class, () -> userService.register(user));
 
-        // Assert
+        // Verify no save operation
         verify(userRepository, never()).save(any(User.class));
     }
+
 
     @Test
     void testRegister_NewUser() {
