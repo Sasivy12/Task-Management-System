@@ -31,10 +31,7 @@ public class SecurityConfig
         http.csrf(customizer -> customizer.disable());
 
         http.authorizeHttpRequests(request -> request
-                .requestMatchers("/register", "/login",
-                        "/v3/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html")
+                .requestMatchers("/register", "/login")
                 .permitAll()
                 .anyRequest()
                 .authenticated());
