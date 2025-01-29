@@ -16,6 +16,8 @@ services:
       POSTGRES_USER: super
       POSTGRES_PASSWORD: tim123
       POSTGRES_DB: task
+      SPRINGDOC_API_DOCS_ENABLED: "true"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "true"
     ports:
       - "5432:5432"
     volumes:
