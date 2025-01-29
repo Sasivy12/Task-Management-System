@@ -37,7 +37,8 @@ class UserServiceTest {
     private BCryptPasswordEncoder encoder;
 
     @BeforeEach
-    void setUp() {
+    void setUp()
+    {
         MockitoAnnotations.openMocks(this);
         encoder = new BCryptPasswordEncoder(12);
     }
@@ -59,9 +60,9 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
-
     @Test
-    void testRegister_NewUser() {
+    void testRegister_NewUser()
+    {
         // Arrange
         User user = new User();
         user.setEmail("test@example.com");
@@ -78,7 +79,8 @@ class UserServiceTest {
     }
 
     @Test
-    void testVerify_SuccessfulAuthentication() {
+    void testVerify_SuccessfulAuthentication()
+    {
         // Arrange
         User user = new User();
         user.setEmail("test@example.com");
@@ -98,7 +100,8 @@ class UserServiceTest {
     }
 
     @Test
-    void testVerify_FailedAuthentication() {
+    void testVerify_FailedAuthentication()
+    {
         // Arrange
         User user = new User();
         user.setEmail("test@example.com");
