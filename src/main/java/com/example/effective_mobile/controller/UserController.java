@@ -3,6 +3,7 @@ package com.example.effective_mobile.controller;
 import com.example.effective_mobile.model.User;
 import com.example.effective_mobile.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping
+@Tag(name = "User Management", description = "API for managing user registration and login")
 public class UserController
 {
     @Autowired
