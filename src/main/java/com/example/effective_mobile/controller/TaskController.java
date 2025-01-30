@@ -40,16 +40,16 @@ public class TaskController {
     @Operation(summary = "Delete a task", description = "Delete a task by ID for a specific user")
     @DeleteMapping("/{user_id}/{task_id}")
     public void deleteTask(
-            @PathVariable("user_id") Long userId,
-            @PathVariable("task_id") Long taskId) {
+            @Parameter(description = "User ID", required = true) @PathVariable("user_id") Long userId,
+            @Parameter(description = "Task ID", required = true) @PathVariable("task_id") Long taskId) {
         taskService.deleteTask(userId, taskId);
     }
 
     @Operation(summary = "Update a task", description = "Update an existing task for a user")
     @PutMapping("/{user_id}/{task_id}")
     public void updateTask(
-            @PathVariable("user_id") Long userId,
-            @PathVariable("task_id") Long taskId,
+            @Parameter(description = "User ID", required = true) @PathVariable("user_id") Long userId,
+            @Parameter(description = "Task ID", required = true) @PathVariable("task_id") Long taskId,
             @RequestBody Task updatedTask) {
         taskService.editTask(userId, taskId, updatedTask);
     }
@@ -57,52 +57,52 @@ public class TaskController {
     @Operation(summary = "Get a specific task", description = "Retrieve a specific task by ID for a user")
     @GetMapping("/{user_id}/{task_id}")
     public Optional<Task> getASpecificTask(
-            @PathVariable("user_id") Long userId,
-            @PathVariable("task_id") Long taskId) {
+            @Parameter(description = "User ID", required = true)@PathVariable("user_id") Long userId,
+            @Parameter(description = "Task ID", required = true) @PathVariable("task_id") Long taskId) {
         return taskService.getASpecificTask(userId, taskId);
     }
 
     @Operation(summary = "Create a comment", description = "Add a comment to a task")
     @PostMapping("/{user_id}/{task_id}")
     public Comment createComment(
-            @PathVariable("task_id") Long taskId,
-            @PathVariable("user_id") Long authorId,
+            @Parameter(description = "User ID", required = true) @PathVariable("task_id") Long authorId,
+            @Parameter(description = "Task ID", required = true) @PathVariable("user_id") Long taskId,
             @RequestBody Comment comment) {
-        return commentService.createComment(taskId, authorId, comment);
+        return commentService.createComment(authorId, taskId, comment);
     }
 
     @Operation(summary = "Delete a comment", description = "Delete a comment by ID")
     @DeleteMapping("/{user_id}/{task_id}/{comment_id}")
     public void deleteComment(
-            @PathVariable("comment_id") Long commentId,
-            @PathVariable("user_id") Long authorId,
-            @PathVariable("task_id") Long taskId) {
-        commentService.deleteComment(commentId, authorId, taskId);
+            @Parameter(description = "User ID", required = true) @PathVariable("comment_id") Long authorId,
+            @Parameter(description = "Task ID", required = true) @PathVariable("user_id") Long taskId,
+            @Parameter(description = "Comment ID", required = true) @PathVariable("task_id") Long commentId) {
+        commentService.deleteComment(authorId, taskId, commentId);
     }
 
     @Operation(summary = "Get comments by task", description = "Retrieve all comments for a specific task")
     @GetMapping("/{user_id}/{task_id}/comment")
     public List<Comment> getCommentByTask(
-            @PathVariable("task_id") Long taskId,
-            @PathVariable("user_id") Long authorId) {
-        return commentService.getCommentsByTask(taskId, authorId);
+            @Parameter(description = "User ID", required = true) @PathVariable("task_id") Long authorId,
+            @Parameter(description = "User ID", required = true) @PathVariable("user_id") Long taskId) {
+        return commentService.getCommentsByTask(authorId, taskId);
     }
 
     @Operation(summary = "Update a comment", description = "Update an existing comment for a task")
     @PutMapping("/{user_id}/{task_id}/{comment_id}")
     public void updateComment(
-            @PathVariable("comment_id") Long commentId,
-            @PathVariable("user_id") Long authorId,
-            @PathVariable("task_id") Long taskId,
+            @Parameter(description = "User ID", required = true) @PathVariable("comment_id") Long authorId,
+            @Parameter(description = "Task ID", required = true) @PathVariable("user_id") Long taskId,
+            @Parameter(description = "Comment ID", required = true) @PathVariable("task_id") Long commentId,
             @RequestBody Comment updatedComment) {
-        commentService.editComment(commentId, authorId, taskId, updatedComment);
+        commentService.editComment(authorId, taskId, commentId, updatedComment);
     }
 
     @Operation(summary = "Get comments by user", description = "Retrieve all comments made by a user for a task")
     @GetMapping("/{user_id}/{task_id}/comments/byuser")
     public List<Comment> getCommentsByUser(
-            @PathVariable("task_id") Long taskId,
-            @PathVariable("user_id") Long authorId) {
-        return commentService.getCommentsByUser(taskId, authorId);
+            @Parameter(description = "User ID", required = true) @PathVariable("task_id") Long authorId,
+            @Parameter(description = "Task ID", required = true) @PathVariable("user_id") Long taskId) {
+        return commentService.getCommentsByUser(authorId, taskId);
     }
 }
